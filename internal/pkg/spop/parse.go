@@ -8,9 +8,11 @@ import (
 // ParseBinaryHeader takes binary headers from encoded as per
 // http://docs.haproxy.org/2.8/configuration.html#7.3.6-req.hdrs_bin and parses
 // it into a http.Header type
-func ParseBinaryHeader(b []byte) (h http.Header, err error) {
+func ParseBinaryHeader(b []byte) (http.Header, error) {
 	var blankFound bool
-	h = make(http.Header)
+
+	// start with new http.Header struct
+	h := make(http.Header)
 
 	p := 0
 	for p < len(b) {
@@ -51,9 +53,12 @@ func ParseBinaryHeader(b []byte) (h http.Header, err error) {
 		// add decoded data
 		h.Add(name, value)
 	}
+
+	// check that blanks were found
 	if !blankFound {
-		return nil, fmt.Errorf("headers possibly trucated as final blank line not found")
+		return nil, fmt.Errorf("headers possibly trucated as final blanks found")
 	}
+
 	return h, nil
 }
 
