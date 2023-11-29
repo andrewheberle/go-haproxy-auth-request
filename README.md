@@ -1,6 +1,6 @@
 # go-haproxy-auth-request
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/andrewheberle/go-http-auth-request?logo=go&style=flat-square)](https://goreportcard.com/report/github.com/andrewheberle/go-http-auth-request)
+[![Go Report Card](https://goreportcard.com/badge/github.com/andrewheberle/go-haproxy-auth-request?logo=go&style=flat-square)](https://goreportcard.com/report/github.com/andrewheberle/go-haproxy-auth-request)
 
 This is service written in Go to integrate [Authelia](https://www.authelia.com/) with HAProxy using [SPOE](https://www.haproxy.org/download/2.8/doc/SPOE.txt) as an alternative to [haproxy-auth-request](https://github.com/TimWolla/haproxy-auth-request/) via Lua.
 
