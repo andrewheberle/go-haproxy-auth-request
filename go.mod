@@ -1,4 +1,4 @@
-module github.com/andrewheberle/haproxy-auth-request
+module github.com/andrewheberle/go-haproxy-auth-request
 
 go 1.21
 

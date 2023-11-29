@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/andrewheberle/haproxy-auth-request/internal/pkg/spop"
+	"github.com/andrewheberle/go-haproxy-auth-request/internal/pkg/spop"
 	"github.com/negasus/haproxy-spoe-go/action"
 	"github.com/negasus/haproxy-spoe-go/request"
 )

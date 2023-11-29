@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/andrewheberle/haproxy-auth-request/internal/pkg/logger"
-	"github.com/andrewheberle/haproxy-auth-request/pkg/auth"
+	"github.com/andrewheberle/go-haproxy-auth-request/internal/pkg/logger"
+	"github.com/andrewheberle/go-haproxy-auth-request/pkg/auth"
 	"github.com/negasus/haproxy-spoe-go/agent"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
