@@ -1,0 +1,41 @@
+---
+jwt_secret: a_very_important_secret
+
+server:
+  host: 0.0.0.0
+  port: 9091
+
+log:
+  level: debug
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: auth.example.com
+      policy: bypass
+    - domain: app.example.com
+      policy: one_factor
+
+notifier:
+  disable_startup_check: true
+  smtp:
+    host: 127.0.0.1
+    port: 1025
+    sender: "Authelia <admin@example.com>"
+
+session:
+  # This secret can also be set using the env variables AUTHELIA_SESSION_SECRET_FILE
+  secret: unsecure_session_secret
+  name: authelia_session
+  domain: example.com  # Should match whatever your root protected domain is
+  expiration: 3600  # 1 hour
+  inactivity: 300  # 5 minutes
+
+storage:
+  encryption_key: you_must_generate_a_random_string_of_more_than_twenty_chars_and_configure_this
+  local:
+    path: /config/db.sqlite3

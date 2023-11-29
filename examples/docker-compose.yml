@@ -1,0 +1,24 @@
+---
+version: "3.9"
+services:
+  haproxy:
+    image: haproxy:lts
+    container_name: haproxy
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./spoe.cfg:/usr/local/etc/haproxy/spoe.cfg
+      - ./auth.pem:/usr/local/etc/haproxy/auth.pem
+    ports:
+      - "80:8080/tcp"
+      - "443:8443/tcp"
+  spoa:
+    image: ghcr.io/andrewheberle/haproxy-auth-request:latest
+    container_name: spoa
+    environment:
+      - AUTH_URL=http://authelia:9091/api/verify
+  authelia:
+    image: docker.io/authelia/authelia:latest
+    container_name: authelia
+    volumes:
+      - ./configuration.yml:/config/configuration.yml
+      - ./users_database.yml:/config/users_database.yml
