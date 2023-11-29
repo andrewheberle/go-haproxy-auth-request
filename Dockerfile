@@ -5,7 +5,7 @@ COPY . /build
 RUN cd /build && \
     go build ./cmd/haproxy-auth-request
 
-FROM gcr.io/distroless/base-debian12@sha256:1dfdb5ed7d9a66dcfc90135b25a46c25a85cf719b619b40c249a2445b9d055f5
+FROM gcr.io/distroless/base-debian12:nonroot@sha256:5a779e9c2635dbea68ae7988f398f95686ccde186cd2abf51207e41ed2ec51f4
 
 COPY --from=builder /build/haproxy-auth-request /app/haproxy-auth-request
 
