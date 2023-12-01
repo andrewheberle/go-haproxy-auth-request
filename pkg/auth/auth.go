@@ -17,12 +17,17 @@ import (
 type AuthHandler struct {
 	client  *http.Client
 	headers []string
+	legacy  bool
 	method  string
 	timeout time.Duration
 	url     *url.URL
 }
 
 func NewHandler(endpoint, method string, timeout time.Duration, headers []string) (*AuthHandler, error) {
+	return handler(endpoint, method, timeout, headers, false)
+}
+
+func handler(endpoint, method string, timeout time.Duration, headers []string, legacy bool) (*AuthHandler, error) {
 	u, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("problem parsing url: %w", err)
@@ -40,7 +45,7 @@ func NewHandler(endpoint, method string, timeout time.Duration, headers []string
 		headers = make([]string, 0)
 	}
 
-	return &AuthHandler{client, headers, method, timeout, u}, nil
+	return &AuthHandler{client, headers, legacy, method, timeout, u}, nil
 }
 
 func (auth *AuthHandler) Handler(req *request.Request) {
