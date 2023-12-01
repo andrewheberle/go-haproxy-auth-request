@@ -15,11 +15,12 @@ go install github.com/andrewheberle/go-haproxy-auth-request/cmd/haproxy-auth-req
 ```sh
 ./haproxy-auth-request --help
 Usage of haproxy-auth-request.exe:
-      --cookie string      Session cookie name (default "authelia_session")
       --debug              Enable debug logging
+      --headers strings    HTTP Headers to return on success (default [authorization,proxy-authorization,remote-user,remote-groups,remote-name,remote-email])
       --listen string      Listen address (default "127.0.0.1:3000")
+      --method string      HTTP Method for authentication request (default "HEAD")
       --timeout duration   Timeout for verification (default 5s)
-      --url string         URL to perform verification against (default "http://127.0.0.1:9091/api/verify")
+      --url string         URL to perform verification against (default "http://127.0.0.1:9091/api/authz/forward-auth")
 ```
 
 ## Example

@@ -3,6 +3,7 @@ package main
 import (
 	"log/slog"
 	"net"
+	"net/http"
 	"os"
 	"time"
 
@@ -17,8 +18,9 @@ func main() {
 	// logging
 	// command line flags
 	pflag.String("listen", "127.0.0.1:3000", "Listen address")
-	pflag.String("cookie", "authelia_session", "Session cookie name")
-	pflag.String("url", "http://127.0.0.1:9091/api/verify", "URL to perform verification against")
+	pflag.String("url", "http://127.0.0.1:9091/api/authz/forward-auth", "URL to perform verification against")
+	pflag.String("method", http.MethodHead, "HTTP Method for authentication request")
+	pflag.StringSlice("headers", []string{"authorization", "proxy-authorization", "remote-user", "remote-groups", "remote-name", "remote-email"}, "HTTP Headers to return on success")
 	pflag.Duration("timeout", time.Second*5, "Timeout for verification")
 	pflag.Bool("debug", false, "Enable debug logging")
 	pflag.Parse()
@@ -49,7 +51,7 @@ func main() {
 	}
 	defer l.Close()
 
-	h, err := auth.NewHandler(viper.GetString("url"), viper.GetString("cookie"), viper.GetDuration("timeout"))
+	h, err := auth.NewHandler(viper.GetString("url"), viper.GetString("method"), viper.GetDuration("timeout"), viper.GetStringSlice("headers"))
 	if err != nil {
 		slog.Error("error creating auth handler", "error", err)
 		os.Exit(1)

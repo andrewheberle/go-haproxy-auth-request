@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/andrewheberle/go-haproxy-auth-request/internal/pkg/spop"
@@ -15,12 +16,13 @@ import (
 
 type AuthHandler struct {
 	client  *http.Client
-	cookie  string
+	headers []string
+	method  string
 	timeout time.Duration
 	url     *url.URL
 }
 
-func NewHandler(endpoint, cookie string, timeout time.Duration) (*AuthHandler, error) {
+func NewHandler(endpoint, method string, timeout time.Duration, headers []string) (*AuthHandler, error) {
 	u, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("problem parsing url: %w", err)
@@ -33,7 +35,12 @@ func NewHandler(endpoint, cookie string, timeout time.Duration) (*AuthHandler, e
 		},
 	}
 
-	return &AuthHandler{client, cookie, timeout, u}, nil
+	// handle nil headers
+	if headers == nil {
+		headers = make([]string, 0)
+	}
+
+	return &AuthHandler{client, headers, method, timeout, u}, nil
 }
 
 func (auth *AuthHandler) Handler(req *request.Request) {
@@ -97,31 +104,11 @@ func (auth *AuthHandler) Handler(req *request.Request) {
 		req.Actions.SetVar(action.ScopeTransaction, "response_successful", true)
 		logger = logger.With("response_successful", true)
 
-		// set cookie response if header set
-		for _, cookie := range res.Cookies() {
-			if cookie.Name == auth.cookie {
-				req.Actions.SetVar(action.ScopeTransaction, "response_cookie", cookie.String())
+		// set variables in response
+		for _, h := range auth.headers {
+			if v := res.Header.Get(h); v != "" {
+				req.Actions.SetVar(action.ScopeRequest, fmt.Sprintf("response_header.%s", normalise(h)), v)
 			}
-		}
-
-		// set user
-		if user := res.Header.Get("remote-user"); user != "" {
-			req.Actions.SetVar(action.ScopeTransaction, "response_remote_user", user)
-		}
-
-		// set name
-		if name := res.Header.Get("remote-name"); name != "" {
-			req.Actions.SetVar(action.ScopeTransaction, "response_remote_name", name)
-		}
-
-		// set email
-		if email := res.Header.Get("remote-email"); email != "" {
-			req.Actions.SetVar(action.ScopeTransaction, "response_remote_email", email)
-		}
-
-		// set groups
-		if groups := res.Header.Get("remote-groups"); groups != "" {
-			req.Actions.SetVar(action.ScopeTransaction, "response_remote_groups", groups)
 		}
 
 		logger.Info("message handled")
@@ -139,16 +126,13 @@ func (auth *AuthHandler) Handler(req *request.Request) {
 			req.Actions.SetVar(action.ScopeTransaction, "response_redirect", true)
 			req.Actions.SetVar(action.ScopeTransaction, "response_location", location)
 		}
-
-		// set cookie response if header set
-		for _, cookie := range res.Cookies() {
-			if cookie.Name == auth.cookie {
-				req.Actions.SetVar(action.ScopeTransaction, "response_cookie", cookie.String())
-			}
-		}
 	}
 
 	// all other responses
 	req.Actions.SetVar(action.ScopeTransaction, "response_successful", false)
 	logger.Info("message handled")
+}
+
+func normalise(s string) string {
+	return strings.ReplaceAll(strings.ToLower(s), "-", "_")
 }
