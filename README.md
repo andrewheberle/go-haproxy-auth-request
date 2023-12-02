@@ -12,6 +12,8 @@ go install github.com/andrewheberle/go-haproxy-auth-request/cmd/haproxy-auth-req
 
 ## Usage
 
+The service can be managed via the following command line flags:
+
 ```sh
 ./haproxy-auth-request --help
 Usage of haproxy-auth-request.exe:
@@ -22,6 +24,10 @@ Usage of haproxy-auth-request.exe:
       --timeout duration   Timeout for verification (default 5s)
       --url string         URL to perform verification against (default "http://127.0.0.1:9091/api/authz/forward-auth")
 ```
+
+In addition you may set these values via environment variables with the `AUTH_` prefix, such as:
+
+`AUTH_URL=http://authelia:9091/api/verify`
 
 ## Returned Variables
 
@@ -90,7 +96,7 @@ backend be_protected
 	http-request redirect location %[var(txn.auth_request.response_location)] if { var(txn.auth_request.response_redirect) -m bool } !{ var(txn.auth_request.response_successful) -m bool }
 	http-request deny if !{ var(txn.auth_request.response_successful) -m bool }
 
-      # have your server(s) here
+       # have your server(s) here
 ```
 
 ## Example
