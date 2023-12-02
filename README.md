@@ -27,7 +27,8 @@ Usage of haproxy-auth-request.exe:
 
 In addition you may set these values via environment variables with the `AUTH_` prefix, such as:
 
-`AUTH_URL=http://authelia:9091/api/verify`
+* `AUTH_URL=http://authelia:9091/api/verify`
+* `AUTH_METHOD=GET`
 
 ## Returned Variables
 
