@@ -16,7 +16,7 @@ go install github.com/andrewheberle/go-haproxy-auth-request/cmd/haproxy-auth-req
 docker run -p 3000:3000 ghcr.io/andrewheberle/go-haproxy-auth-request
 ```
 
-**Note:** The container us built with the environment variablr `AUTH_LISTEN=:3000` set. 
+**Note:** The container is built with the environment variable `AUTH_LISTEN=:3000` set. 
 
 ## Usage
 
