@@ -10,6 +10,12 @@ This is service written in Go to integrate [Authelia](https://www.authelia.com/)
 go install github.com/andrewheberle/go-haproxy-auth-request/cmd/haproxy-auth-request
 ```
 
+### Docker
+
+```sh
+docker run -p 3000:3000 ghcr.io/andrewheberle/go-haproxy-auth-request
+```
+
 ## Usage
 
 The service can be managed via the following command line flags:
@@ -82,8 +88,8 @@ The following HAProxy configuration snippet shows this process:
 ```text
 # a protected backend
 backend be_protected
-	# set required headers
-	http-request set-header X-Forward-For %[src]
+        # set required headers
+        http-request set-header X-Forward-For %[src]
 	http-request set-header X-Forwarded-Proto %[ssl_fc,iif(https,http)]
 	http-request set-header X-Forwarded-Host %[req.hdr(Host)]
 	http-request set-header X-Forwarded-Uri %[capture.req.uri]
@@ -97,9 +103,9 @@ backend be_protected
 	http-request redirect location %[var(txn.auth_request.response_location)] if { var(txn.auth_request.response_redirect) -m bool } !{ var(txn.auth_request.response_successful) -m bool }
 	http-request deny if !{ var(txn.auth_request.response_successful) -m bool }
 
-       # have your server(s) here
+        # have your server(s) here
 ```
 
-## Example
+## Examples
 
 See the [Examples](examples/README.md) directory for more information.
