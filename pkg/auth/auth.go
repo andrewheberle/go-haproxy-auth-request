@@ -17,17 +17,13 @@ import (
 type AuthHandler struct {
 	client  *http.Client
 	headers []string
-	legacy  bool
 	method  string
 	timeout time.Duration
 	url     *url.URL
 }
 
 func NewHandler(endpoint, method string, timeout time.Duration, headers []string) (*AuthHandler, error) {
-	return handler(endpoint, method, timeout, headers, false)
-}
-
-func handler(endpoint, method string, timeout time.Duration, headers []string, legacy bool) (*AuthHandler, error) {
+	// parse url
 	u, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("problem parsing url: %w", err)
@@ -45,7 +41,7 @@ func handler(endpoint, method string, timeout time.Duration, headers []string, l
 		headers = make([]string, 0)
 	}
 
-	return &AuthHandler{client, headers, legacy, method, timeout, u}, nil
+	return &AuthHandler{client, headers, method, timeout, u}, nil
 }
 
 func (auth *AuthHandler) Handler(req *request.Request) {
@@ -112,7 +108,9 @@ func (auth *AuthHandler) Handler(req *request.Request) {
 		// set variables in response
 		for _, h := range auth.headers {
 			if v := res.Header.Get(h); v != "" {
-				req.Actions.SetVar(action.ScopeRequest, fmt.Sprintf("response_header.%s", normalise(h)), v)
+				k := fmt.Sprintf("response_header.%s", normalise(h))
+				req.Actions.SetVar(action.ScopeRequest, k, v)
+				logger = logger.With(k, v)
 			}
 		}
 
@@ -138,6 +136,7 @@ func (auth *AuthHandler) Handler(req *request.Request) {
 	logger.Info("message handled")
 }
 
+// normalise converts the provided string to lowercase and replaces dashes with underscores
 func normalise(s string) string {
 	return strings.ReplaceAll(strings.ToLower(s), "-", "_")
 }

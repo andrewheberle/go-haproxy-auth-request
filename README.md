@@ -28,7 +28,8 @@ Usage of haproxy-auth-request.exe:
 A number of variables are returned to HAProxy that can be used to determine if
 authentication was successful and the identity of the user in question.
 
-These variables are:
+These variables are available for the whole HTTP transaction (request and
+response):
 
 * `txn.<PREFIX>.response_successful` : Set to `true` if the authentication
   request was successful or `false` otherwise.
@@ -40,6 +41,10 @@ These variables are:
 * `txn.<PREFIX>.response_location` : Set to value of the `Location` header in
   the response to the authentication request. This is used to redirect the
   user to Authelia for authentication.
+
+The following variables are made available in the request scope only to
+minimise memory usage:
+
 * `req.<PREFIX>.response_header.*` : Set to value the relevant authentication
   request header, such as `Remote-User` or `Remote-Email` in order to identify
   the authenticated user.
@@ -51,6 +56,42 @@ These variables are:
   `req.<PREFIX>.response_header.remote_user`.
 
 In the above `<PREFIX>` is set to the value of the spoe agent name in `spoe.cfg`.
+
+## Handling Authentication
+
+The general concepts to implement in your HAProxy configuration are:
+
+1. Add the headers Authelia expects:
+  * X-Forward-For
+  * X-Forwarded-Proto
+  * X-Forwarded-Host
+  * X-Forwarded-Uri
+  * X-Forwarded-Method
+2. Send the SPOE request
+3. Handle the response and redirect for authentication, allow or deny access
+
+The following HAProxy configuration snippet shows this process:
+
+```text
+# a protected backend
+backend be_protected
+	# set required headers
+	http-request set-header X-Forward-For %[src]
+	http-request set-header X-Forwarded-Proto %[ssl_fc,iif(https,http)]
+	http-request set-header X-Forwarded-Host %[req.hdr(Host)]
+	http-request set-header X-Forwarded-Uri %[capture.req.uri]
+	http-request set-header X-Forwarded-Method %[capture.req.method]
+
+	# set up spoe filter
+	filter spoe engine auth-request config /usr/local/etc/haproxy/spoe.cfg
+
+	# send to spoe and act on response
+	http-request send-spoe-group auth-request auth-request-group
+	http-request redirect location %[var(txn.auth_request.response_location)] if { var(txn.auth_request.response_redirect) -m bool } !{ var(txn.auth_request.response_successful) -m bool }
+	http-request deny if !{ var(txn.auth_request.response_successful) -m bool }
+
+      # have your server(s) here
+```
 
 ## Example
 
