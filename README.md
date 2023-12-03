@@ -4,6 +4,8 @@
 
 This is service written in Go to integrate [Authelia](https://www.authelia.com/) with HAProxy using [SPOE](https://www.haproxy.org/download/2.8/doc/SPOE.txt) as an alternative to [haproxy-auth-request](https://github.com/TimWolla/haproxy-auth-request/) via Lua.
 
+The defaults of this service are set to work for the [ForwardAuth](https://github.com/authelia/authelia/blob/master/docs/content/en/reference/guides/proxy-authorization.md) authentication implementation, however the legacy implementation is supported via a change to the authentication URL and the appropriate HAProxy configuration. 
+
 ## Install
 
 ```sh
