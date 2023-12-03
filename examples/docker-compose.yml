@@ -15,7 +15,7 @@ services:
     image: ghcr.io/andrewheberle/go-haproxy-auth-request:latest
     container_name: spoa
     environment:
-      - AUTH_URL=http://authelia:9091/api/verify
+      - AUTH_URL=http://authelia:9091/api/authz/forward-auth
   authelia:
     image: docker.io/authelia/authelia:latest
     container_name: authelia

@@ -2,8 +2,11 @@
 jwt_secret: a_very_important_secret
 
 server:
-  host: 0.0.0.0
-  port: 9091
+  address: 'tcp://:9091/'
+  endpoints:
+    authz:
+      forward-auth:
+        implementation: 'ForwardAuth'
 
 log:
   level: debug
@@ -23,17 +26,18 @@ access_control:
 notifier:
   disable_startup_check: true
   smtp:
-    host: 127.0.0.1
-    port: 1025
+    address: 'smtp://127.0.0.1:1025'
     sender: "Authelia <admin@example.com>"
 
 session:
   # This secret can also be set using the env variables AUTHELIA_SESSION_SECRET_FILE
   secret: unsecure_session_secret
   name: authelia_session
-  domain: example.com  # Should match whatever your root protected domain is
   expiration: 3600  # 1 hour
   inactivity: 300  # 5 minutes
+  cookies:
+    - domain: example.com  # Should match whatever your root protected domain is
+      authelia_url: 'https://auth.example.com'
 
 storage:
   encryption_key: you_must_generate_a_random_string_of_more_than_twenty_chars_and_configure_this
