@@ -114,14 +114,6 @@ func (auth *AuthHandler) Handler(req *request.Request) {
 			}
 		}
 
-		// set cookie if present
-		if cookies := res.Cookies(); len(cookies) == 1 {
-			if v := cookies[0].String(); v != "" {
-				req.Actions.SetVar(action.ScopeRequest, "response_cookie.name", cookies[0].Name)
-				req.Actions.SetVar(action.ScopeRequest, "response_cookie.value", v)
-			}
-		}
-
 		logger.Info("message handled")
 		return
 	}
@@ -136,6 +128,16 @@ func (auth *AuthHandler) Handler(req *request.Request) {
 			logger = logger.With("response_redirect", true, "response_location", location)
 			req.Actions.SetVar(action.ScopeTransaction, "response_redirect", true)
 			req.Actions.SetVar(action.ScopeTransaction, "response_location", location)
+		}
+
+		logger = logger.With("cookies", len(res.Cookies()))
+
+		// set cookie if present
+		if cookies := res.Cookies(); len(cookies) == 1 {
+			if v := cookies[0].String(); v != "" {
+				logger = logger.With("response_cookie", v)
+				req.Actions.SetVar(action.ScopeRequest, "response_cookie", v)
+			}
 		}
 	}
 

@@ -102,9 +102,16 @@ backend be_protected
 	# set up spoe filter
 	filter spoe engine auth-request config /usr/local/etc/haproxy/spoe.cfg
 
-	# send to spoe and act on response
+	# send to spoe
 	http-request send-spoe-group auth-request auth-request-group
+
+  # perform redirect and set cookie if the response was a redirect with a cookie
+  http-request return status 302 hdr location %[var(txn.auth_request.response_location)] hdr set-cookie %[var(req.auth_request.response_cookie)] if { var(txn.auth_request.response_redirect) -m bool } !{ var(txn.auth_request.response_successful) -m bool } { var(req.auth_request.response_cookie) -m found }
+
+  # perform a redirect only if no cookie was provided
 	http-request redirect location %[var(txn.auth_request.response_location)] if { var(txn.auth_request.response_redirect) -m bool } !{ var(txn.auth_request.response_successful) -m bool }
+
+  # deny request otherwise
 	http-request deny if !{ var(txn.auth_request.response_successful) -m bool }
 
         # have your server(s) here
