@@ -114,6 +114,14 @@ func (auth *AuthHandler) Handler(req *request.Request) {
 			}
 		}
 
+		// set cookie if present
+		if cookies := res.Cookies(); len(cookies) == 1 {
+			if v := cookies[0].String(); v != "" {
+				req.Actions.SetVar(action.ScopeRequest, "response_cookie.name", cookies[0].Name)
+				req.Actions.SetVar(action.ScopeRequest, "response_cookie.value", v)
+			}
+		}
+
 		logger.Info("message handled")
 		return
 	}

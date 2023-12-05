@@ -93,7 +93,7 @@ The following HAProxy configuration snippet shows this process:
 # a protected backend
 backend be_protected
         # set required headers
-        http-request set-header X-Forward-For %[src]
+        http-request set-header X-Forwarded-For %[src]
 	http-request set-header X-Forwarded-Proto %[ssl_fc,iif(https,http)]
 	http-request set-header X-Forwarded-Host %[req.hdr(Host)]
 	http-request set-header X-Forwarded-Uri %[capture.req.uri]

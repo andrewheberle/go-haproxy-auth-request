@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-	// logging
 	// command line flags
 	pflag.String("listen", "127.0.0.1:3000", "Listen address")
 	pflag.String("url", "http://127.0.0.1:9091/api/authz/forward-auth", "URL to perform verification against")
