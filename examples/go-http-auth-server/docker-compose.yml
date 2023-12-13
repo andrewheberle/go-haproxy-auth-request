@@ -1,0 +1,29 @@
+---
+version: "3.9"
+services:
+  haproxy:
+    image: haproxy:lts
+    container_name: haproxy
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg
+      - ./spoe.cfg:/usr/local/etc/haproxy/spoe.cfg
+      - ./auth.pem:/usr/local/etc/haproxy/auth.pem
+    ports:
+      - "80:8080/tcp"
+      - "443:8443/tcp"
+  spoa:
+    image: ghcr.io/andrewheberle/go-haproxy-auth-request:v1.2.1
+    container_name: spoa
+    environment:
+      - AUTH_URL=http://auth:9091/api/authz/forward-auth
+  auth:
+    image: ghcr.io/andrewheberle/go-http-auth-server:v1.3.4
+    container_name: auth
+    environment:
+      - AUTH_SP_URL=https://auth.example.net
+      - AUTH_SP_CERT=/config/samlsp.crt
+      - AUTH_SP_KEY=/config/samlsp.key
+      - AUTH_IDP_METADATA=https://samltest.id/saml/idp
+    volumes:
+      - ./samlsp.crt:/config/samlsp.crt
+      - ./samlsp.key:/config/samlsp.key
