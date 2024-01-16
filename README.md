@@ -105,14 +105,19 @@ backend be_protected
 	# send to spoe
 	http-request send-spoe-group auth-request auth-request-group
 
+	# acls for later
+	acl is_redirect var(txn.auth_request.response_redirect) -m bool
+	acl auth_successful var(txn.auth_request.response_successful) -m bool
+	acl has_cookie var(req.auth_request.response_cookie) -m found
+
         # perform redirect and set cookie if the response was a redirect with a cookie
-        http-request return status 302 hdr location %[var(txn.auth_request.response_location)] hdr set-cookie %[var(req.auth_request.response_cookie)] if { var(txn.auth_request.response_redirect) -m bool } !{ var(txn.auth_request.response_successful) -m bool } { var(req.auth_request.response_cookie) -m found }
+        http-request return status 302 hdr location %[var(txn.auth_request.response_location)] hdr set-cookie %[var(req.auth_request.response_cookie)] if is_redirect !auth_successful has_cookie
 
         # perform a redirect only if no cookie was provided
-        http-request redirect location %[var(txn.auth_request.response_location)] if { var(txn.auth_request.response_redirect) -m bool } !{ var(txn.auth_request.response_successful) -m bool }
+        http-request redirect location %[var(txn.auth_request.response_location)] if is_redirect !auth_successful
 
         # deny request otherwise
-        http-request deny if !{ var(txn.auth_request.response_successful) -m bool }
+        http-request deny if !auth_successful
 
         # have your server(s) here
 ```
