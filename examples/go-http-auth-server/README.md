@@ -1,4 +1,4 @@
-# Authelia
+# go-http-auth-server
 
 ## Overview
 
